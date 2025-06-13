@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Ponto_registro",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

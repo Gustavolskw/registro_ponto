@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\Handlers;
 
+use App\Domain\DomainException\ArgumentsValidationException;
 use App\Domain\DomainException\DomainException;
 use App\Domain\DomainException\DomainNotFoundException;
-use App\Domain\Exception\InvalidUserException;
-use App\Domain\Exception\ResourceNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpException;
@@ -70,6 +69,12 @@ class HttpErrorHandler extends SlimErrorHandler
 //                $error->setDescription($exception->getMessage());
 //                $statusCode = 400;
 //            }
+            else if ($exception instanceof ArgumentsValidationException) {
+                $errors = $exception->getErrors();
+                $error->setType(ErrorHandler::VALIDATION_ERROR);
+                $error->setDescription($errors);
+                $statusCode = 422;
+            }
             else {
                 $error->setDescription($exception->getMessage());
             }

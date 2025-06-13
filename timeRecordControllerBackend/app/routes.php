@@ -20,7 +20,11 @@ return function (App $app) {
     });
 
     $app->group("/user", function (RouteCollectorProxy $group) {
-        $group->post("", UserController::class . ":createNewAdminUser");
+        $group->post("", UserController::class . ":createNewUser");
         //$group->get("/{id}", ViewAccountAction::class);
+    });
+
+    $app->group("", function (RouteCollectorProxy $group) {
+        $group->post("/login", UserController::class . ":loginUser");
     });
 };

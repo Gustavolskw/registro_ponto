@@ -5,6 +5,7 @@ namespace App\Adapters\Controller;
 use App\Application\UseCases\User\CreateNewUserPasswordCase;
 use App\Application\UseCases\User\LoginUserCase;
 use App\Application\UseCases\User\UserCreationCase;
+use App\Domain\DomainException\ArgumentsValidationException;
 use App\Domain\DTO\Builders\UserBuilder;
 use App\Infrastructure\Validation\ValidationMessages;
 use Dotenv\Exception\ValidationException;
@@ -22,10 +23,10 @@ class UserController extends Controller
         $this->createNewUserPasswordCase = $createNewUserPasswordCase;
         $this->loginUserCase = $loginUserCase;
         $this->userCreationCase = $userCreationCase;
-
+        parent::__construct();
     }
 
-    public function createNewAdminUser(Request $request, Response $response)
+    public function createNewUser(Request $request, Response $response)
     {
         $body = $this->getFormData($request);
         $rules = [
@@ -38,7 +39,7 @@ class UserController extends Controller
         $validator = $this->validator->make($body, $rules, ValidationMessages::getMessages());
 
         if ($validator->fails()) {
-            throw new ValidationException($validator->errors());
+                throw new ValidationException($validator->errors());
         }
         $validatedData = $validator->validated();
 
@@ -52,5 +53,34 @@ class UserController extends Controller
         return $this->respondWithData($response, $user->toArray());
     }
 
+    public function loginUser(Request $request, Response $response)
+    {
+        $body = $this->getFormData($request);
+        $rules = [
+            'matricula' => 'integer|required',
+            'password' => 'required|string|min:6|max:255',
+        ];
+        $validator = $this->validator->make($body, $rules, ValidationMessages::getMessages());
+        if ($validator->fails()) {
+            throw new ArgumentsValidationException($validator->errors()->toArray());
+        }
+        $validatedData = $validator->validated();
+        $userLogin = $this->loginUserCase->execute($validatedData['matricula'], $validatedData['password']);
+        return $this->respondWithData($response, $userLogin->toArray());
+    }
 
+    public function createFuncionarioPassword(Request $request, Response $response){
+        $body = $this->getFormData($request);
+        $rules = [
+            'matricula' => 'integer|required',
+            'password' => 'required|string|min:6|max:255',
+        ];
+        $validator = $this->validator->make($body, $rules, ValidationMessages::getMessages());
+        if ($validator->fails()) {
+            throw new ArgumentsValidationException($validator->errors()->toArray());
+        }
+        $validatedData = $validator->validated();
+        $userNewPassword = $this->createNewUserPasswordCase->execute($validatedData['matricula'], $validatedData['password']);
+        return $this->respondWithData($response, $userNewPassword->toArray());
+    }
 }
