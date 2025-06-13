@@ -1,0 +1,38 @@
+version: "3.8"
+volumes:
+  mysql-volume-time-record:
+    driver: local
+
+services:
+  mysql:
+    image: mysql:8.3.0
+    container_name: mysql-time-record
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mysql}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-volume-time-record:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - time-record-app
+  time-record-controller-backend:
+    build:
+      context: ./timeRecordControllerBackend
+      dockerfile: Dockerfile
+    container_name: time-record-controller-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./timeRecordControllerBackend:/var/www/html # Mounting the project folder directly
+    env_file:
+      - ./timeRecordControllerBackend/.env
+    depends_on:
+      - mysql
+    networks:
+      - time-record-app
+networks:
+  time-record-app:
+    driver: bridge
