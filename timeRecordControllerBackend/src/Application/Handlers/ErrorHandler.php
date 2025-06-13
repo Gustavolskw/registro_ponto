@@ -20,7 +20,7 @@ class ErrorHandler implements JsonSerializable
 
     private string $type;
 
-    private ?string $description;
+    private string|array|null $description;
 
     public function __construct(string $type, ?string $description = null)
     {
@@ -44,7 +44,7 @@ class ErrorHandler implements JsonSerializable
         return $this->description;
     }
 
-    public function setDescription(?string $description = null): self
+    public function setDescription(string|array|null $description = null): self
     {
         $this->description = $description;
         return $this;
