@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Domain\Entity;
+namespace App\Domain\ValueObject;
 
+use App\Domain\Entity\User;
 use DateTime;
 use DateTimeInterface;
 
 class WorkJourney
 {
     private int $id;
-    private User $user;
     private DateTime $entradaManha;
     private DateTime $saidaManha;
     private DateTime $entradaTarde;
@@ -17,7 +17,6 @@ class WorkJourney
 
     public function __construct(
         ?int $id,
-        User $user,
         DateTime $entradaManha,
         DateTime $saidaManha,
         DateTime $entradaTarde,
@@ -25,7 +24,6 @@ class WorkJourney
         ?DateTimeInterface $createdAt
     ) {
         $this->id = $id;
-        $this->user = $user;
         $this->entradaManha = $entradaManha;
         $this->saidaManha = $saidaManha;
         $this->entradaTarde = $entradaTarde;
@@ -36,11 +34,6 @@ class WorkJourney
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
     }
 
     public function getEntradaManha(): string
@@ -66,11 +59,6 @@ class WorkJourney
     public function getCreatedAt(): string
     {
         return $this->createdAt->format('Y-m-d H:i:s');
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
     }
 
     public function setEntradaManha(DateTime $entradaManha): void

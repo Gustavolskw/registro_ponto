@@ -3,21 +3,35 @@
 namespace App\Application\UseCases\Appointament;
 
 use App\Domain\DTO\Builders\AppointmentRecordBuilder;
-use App\Domain\Entity\RegisterType;
+use App\Domain\DTO\Data\AppointmentRecordData;
+use App\Domain\Entity\AppointmentRecord;
 use App\Domain\Entity\User;
 use App\Domain\Interfaces\AppointmentRecordRepository;
-use App\Domain\Interfaces\RegisterTypeRepository;
+use App\Domain\Interfaces\RegisterTypeDAO;
 use App\Domain\Interfaces\UserRepository;
+use App\Domain\ValueObject\RegisterType;
 use InvalidArgumentException;
 
-class CreateAppointmentCase
+class RegisterAppointmentCase
 {
-    public function __construct(private AppointmentRecordRepository $appointmentRecordRepository, private RegisterTypeRepository $registerTypeRepository, private UserRepository $userRepository){}
+    public function __construct(private AppointmentRecordRepository $appointmentRecordRepository, private RegisterTypeDAO $registerTypeRepository, private UserRepository $userRepository){}
 
-    public function execute(AppointmentRecordBuilder $appointmentRecordBuilder): void
+    public function execute(AppointmentRecordBuilder $appointmentRecordBuilder): AppointmentRecordData
     {
-        $this->validateAppointmentType($appointmentRecordBuilder->getAppointmentTypeId());
+        $type = $this->validateAppointmentType($appointmentRecordBuilder->getAppointmentTypeId());
+        $user = $this->validateUser($appointmentRecordBuilder->getUserId());
 
+        $appointmentRecord = new AppointmentRecord(
+          null,
+            $user,
+            $type,
+            $appointmentRecordBuilder->getDate(),
+            $appointmentRecordBuilder->getTime(),
+            null
+        );
+
+        $newAppointmentRecord = $this->appointmentRecordRepository->saveRecord($appointmentRecord);
+        return new AppointmentRecordData($newAppointmentRecord);
     }
     public function validateAppointmentType($typeId): RegisterType
     {
@@ -35,7 +49,6 @@ class CreateAppointmentCase
         if(empty($userId)){
             throw new InvalidArgumentException("User ID cannot be empty.");
         }
-        // Assuming there's a method to validate user existence
         $user = $this->userRepository->findById($userId);
         if(!$user){
             throw new InvalidArgumentException("User with ID {$userId} does not exist.");

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Entity;
 
+use App\Domain\ValueObject\RegisterType;
 use DateTime;
 use DateTimeInterface;
 

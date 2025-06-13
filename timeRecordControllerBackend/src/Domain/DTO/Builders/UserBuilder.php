@@ -4,30 +4,18 @@ namespace App\Domain\DTO\Builders;
 class UserBuilder
 {
 
-    private int $id;
-    private int $matricula;
     private string $name;
     private string $password;
     private int $profileId;
+    private int $workJourneyId;
 
 
-    public function __construct(int $id, int $matricula,  string $name, string $password, int $profileId)
+    public function __construct(string $name, string $password, int $profileId, int $workJourneyId)
     {
-        $this->id = $id;
-        $this->matricula = $matricula;
         $this->name = $name;
         $this->password = $password;
         $this->profileId = $profileId;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getMatricula(): int
-    {
-        return $this->matricula;
+        $this->workJourneyId = $workJourneyId;
     }
 
     public function getName(): string
@@ -43,8 +31,8 @@ class UserBuilder
     {
         return $this->profileId;
     }
-
-
-
-
+    public function getWorkJourneyId(): int
+    {
+        return $this->workJourneyId;
+    }
 }

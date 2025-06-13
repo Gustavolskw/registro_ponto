@@ -2,15 +2,12 @@
 
 namespace App\Application\UseCases\User;
 
-use App\Application\UseCases\Auth;
+use App\Application\Dependency\Auth;
 use App\Domain\DomainException\ArgumentsException;
 use App\Domain\DomainException\DomainNotFoundException;
 use App\Domain\DomainException\InvalidAuthentication;
-use App\Domain\DTO\Builders\UserBuilder;
 use App\Domain\DTO\Data\AuthUser;
-use App\Domain\Entity\User;
 use App\Domain\Interfaces\UserRepository;
-use App\Domain\ValueObject\Profile;
 
 class LoginUserCase
 {

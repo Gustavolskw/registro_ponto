@@ -3,7 +3,7 @@
 namespace App\Domain\DTO\Data;
 
 use App\Domain\Entity\User;
-use App\Domain\Entity\WorkJourney;
+use App\Domain\ValueObject\WorkJourney;
 
 class AuthUser
 {

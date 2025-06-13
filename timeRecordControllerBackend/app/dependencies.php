@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 use App\Application\Settings\Settings;
 use App\Application\Settings\SettingsInterface;
+use App\Domain\Interfaces\AppointmentRecordRepository;
+use App\Domain\Interfaces\ProfileDAO;
+use App\Domain\Interfaces\RegisterTypeDAO;
+use App\Domain\Interfaces\UserRepository;
+use App\Domain\Interfaces\WorkJourneyDAO;
+use App\Infrastructure\DAO\ProfileDAOImpl;
+use App\Infrastructure\DAO\RegisterTypeDAOImpl;
+use App\Infrastructure\DAO\WorkJourneyDAOImpl;
+use App\Infrastructure\Persistence\AppointmentRecordRepositoryImpl;
+use App\Infrastructure\Persistence\UserRepositoryImpl;
 use DI\ContainerBuilder;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -56,5 +66,11 @@ return function (ContainerBuilder $containerBuilder) {
             ],
         ],
         //WalletRepository::class => DI\autowire(PdoWalletRepository::class),
+        AppointmentRecordRepository::class => DI\autowire(AppointmentRecordRepositoryImpl::class),
+        UserRepository::class => DI\autowire(UserRepositoryImpl::class),
+        ProfileDAO::class => DI\autowire(ProfileDAOImpl::class),
+        RegisterTypeDAO::class => DI\autowire(RegisterTypeDAOImpl::class),
+        WorkJourneyDAO::class => DI\autowire(WorkJourneyDAOImpl::class),
+
     ]);
 };

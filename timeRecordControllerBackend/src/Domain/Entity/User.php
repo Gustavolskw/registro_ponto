@@ -3,6 +3,7 @@
 namespace App\Domain\Entity;
 
 use App\Domain\ValueObject\Profile;
+use App\Domain\ValueObject\WorkJourney;
 use DateTimeInterface;
 
 class User
@@ -13,15 +14,17 @@ class User
     private string $name;
     private string $password;
     private Profile  $profile;
+    private WorkJourney $workJourney;
     private DateTimeInterface $createdAt;
 
-    public function __construct(?int $id, int $matricula,  string $name, string $password, Profile $profile, ?DateTimeInterface $createdAt)
+    public function __construct(?int $id, int $matricula,  string $name, string $password, Profile $profile, WorkJourney $workJourney,  ?DateTimeInterface $createdAt)
     {
         $this->id = $id;
         $this->matricula = $matricula;
         $this->name = $name;
         $this->password = $password;
         $this->profile = $profile;
+        $this->workJourney = $workJourney;
         $this->createdAt = $createdAt;
     }
 
@@ -48,6 +51,10 @@ class User
     public function getProfile(): Profile
     {
         return $this->profile;
+    }
+    public function getWorkJourney(): WorkJourney
+    {
+        return $this->workJourney;
     }
 
     public function getCreatedAt(): DateTimeInterface

@@ -31,14 +31,14 @@
         "illuminate/validation": "^10.0",
         "moneyphp/money": "^4.7",
         "monolog/monolog": "^2.8",
-        "php-di/php-di": "^6.4",
+        "php-di/php-di": "^7.0",
         "slim/psr7": "^1.5",
         "slim/slim": "^4.10",
         "symfony/yaml": "^7.2",
         "vlucas/phpdotenv": "^5.6",
         "ext-intl": "*",
         "ext-bcmath": "*",
-        "nesbot/carbon": "^2.0",
+        "nesbot/carbon": "^2.0"
     },
     "require-dev": {
         "jangregor/phpstan-prophecy": "^1.0.0",

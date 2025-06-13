@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\UseCases;
+namespace App\Application\Dependency;
 
 use App\Domain\Entity\User;
 use Firebase\JWT\JWT;
@@ -11,7 +11,7 @@ trait Auth
 {
     public function buildPayload(User $user): ?array
     {
-        $payload = [
+        return [
             'iss' => 'auth_service',
             'sub' => $user->getId(),
             'email' => $user->getMatricula(),
@@ -19,7 +19,6 @@ trait Auth
             'iat' => time(),
             'exp' => time() + 3600,
         ];
-        return $payload;
     }
     public function encodeJwt(array $payload): string
     {

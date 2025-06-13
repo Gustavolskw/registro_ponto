@@ -14,25 +14,23 @@ final class Version20250612022119 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create users table';
+        return 'Create jornada_trabalho table';
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->createTable('users');
+        $table = $schema->createTable('jornada_trabalho');
         $table->addColumn('id', 'bigint', ['autoincrement' => true]);
-        $table->addColumn('matricula', 'bigint', ['notnull' => true]);
-        $table->addColumn('nome', 'string', ['length' => 100]);
-        $table->addColumn('senha', 'text');
-        $table->addColumn('perfil_id', 'bigint');
-        $table->addForeignKeyConstraint('perfil', ['perfil_id'], ['id']);
+        $table->addColumn('entrada_manha', 'time');
+        $table->addColumn('saida_manha', 'time');
+        $table->addColumn('entrada_tarde', 'time');
+        $table->addColumn('saida_tarde', 'time');
         $table->addColumn('created_at', 'datetime', ['default' => 'CURRENT_TIMESTAMP']);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['matricula']);
     }
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable('users');
+        $schema->dropTable('jornada_trabalho');
     }
 }
