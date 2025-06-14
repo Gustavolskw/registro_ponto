@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Application\Middleware\AuthMiddleware;
 use App\Application\Settings\Settings;
 use App\Application\Settings\SettingsInterface;
 use App\Domain\Interfaces\AppointmentRecordRepository;
@@ -65,12 +66,11 @@ return function (ContainerBuilder $containerBuilder) {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ],
         ],
-        //WalletRepository::class => DI\autowire(PdoWalletRepository::class),
         AppointmentRecordRepository::class => DI\autowire(AppointmentRecordRepositoryImpl::class),
         UserRepository::class => DI\autowire(UserRepositoryImpl::class),
         ProfileDAO::class => DI\autowire(ProfileDAOImpl::class),
         RegisterTypeDAO::class => DI\autowire(RegisterTypeDAOImpl::class),
         WorkJourneyDAO::class => DI\autowire(WorkJourneyDAOImpl::class),
-
+        AuthMiddleware::class => fn() => new AuthMiddleware(getenv('JWT_SECRET')),
     ]);
 };

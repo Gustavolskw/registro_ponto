@@ -9,6 +9,7 @@ use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
+
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
         // CORS Pre-Flight OPTIONS Request Handler
         return $response;
@@ -19,12 +20,12 @@ return function (App $app) {
         return $response;
     });
 
-    $app->group("/user", function (RouteCollectorProxy $group) {
-        $group->post("", UserController::class . ":createNewUser");
+    $app->group("/user", function (RouteCollectorProxy $group){
+        $group->post("", UserController::class . ":createNewUser")->add(withRole([1]));
         //$group->get("/{id}", ViewAccountAction::class);
     });
 
-    $app->group("", function (RouteCollectorProxy $group) {
-        $group->post("/login", UserController::class . ":loginUser");
+    $app->group('', function (RouteCollectorProxy $group){
+        $group->post('/login', UserController::class . ':loginUser');
     });
 };

@@ -21,8 +21,8 @@ class LoginUserCase
         if(empty($user->getPassword()) || !password_verify($password, $user->getPassword())){
             throw new InvalidAuthentication('Invalid credentials');
         }
-        $payload = $this->buildPayload($user);
-        $jwtToken = $this->encodeJwt($payload);
+
+        $jwtToken = $this->generateJwt($user);
         return new AuthUser($user, $jwtToken);
     }
 

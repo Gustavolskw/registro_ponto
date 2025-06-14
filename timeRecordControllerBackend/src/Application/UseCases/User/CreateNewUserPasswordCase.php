@@ -21,11 +21,9 @@ class CreateNewUserPasswordCase
     {
         $user = $this->validateUser($userId);
         $this->validateNewPassword($newPassword);
-
         $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
         $this->userRepository->update($user);
-        $payload = $this->buildPayload($user);
-        $jwtToken = $this->encodeJwt($payload);
+        $jwtToken = $this->generateJwt($user);
         return new AuthUser($user, $jwtToken, null);
     }
 
@@ -36,7 +34,7 @@ class CreateNewUserPasswordCase
         }
         $user = $this->userRepository->findByMatriculaAndPasswordNull($matricula);
         if (!$user) {
-            throw new DomainNotFoundException("User with matricula {$matricula} does not exist.");
+            throw new DomainNotFoundException("Matricula {$matricula} is Invalid to register new password!.");
         }
         return $user;
     }

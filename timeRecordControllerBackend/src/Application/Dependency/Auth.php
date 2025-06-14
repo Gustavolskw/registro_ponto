@@ -12,9 +12,9 @@ trait Auth
     public function buildPayload(User $user): ?array
     {
         return [
-            'iss' => 'auth_service',
+            'iss' => 'appointment-system',
             'sub' => $user->getId(),
-            'email' => $user->getMatricula(),
+            'matricula' => $user->getMatricula(),
             'role' => $user->getProfile()->getId(),
             'iat' => time(),
             'exp' => time() + 3600,
@@ -28,6 +28,10 @@ trait Auth
     {
         $key = new Key($_ENV['JWT_SECRET'], 'HS256');
         return JWT::decode($token, $key);
+    }
+    public function generateJwt(User $user): string
+    {
+      return $this->encodeJwt($this->buildPayload($user));
     }
 
 }

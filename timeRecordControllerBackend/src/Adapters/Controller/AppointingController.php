@@ -2,7 +2,7 @@
 
 namespace App\Adapters\Controller;
 
-class AppointingController
+class AppointingController extends Controller
 {
 
 }

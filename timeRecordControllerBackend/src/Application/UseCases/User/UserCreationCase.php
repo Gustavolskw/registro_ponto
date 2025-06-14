@@ -37,8 +37,7 @@ class UserCreationCase
         $newUser = $this->userRepository->save(
             $newUserData
         );
-        $payload = $this->buildPayload($newUser);
-        $jwtToken = $this->encodeJwt($payload);
+        $jwtToken = $this->generateJwt($user);
         return new AuthUser($newUser, $jwtToken, $newWorkJourney);
     }
     private function validateProfileType($profileId):Profile

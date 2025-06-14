@@ -3,6 +3,7 @@
 namespace App\Application\UseCases\Appointament;
 
 use App\Domain\DTO\Builders\AppointmentRecordBuilder;
+use App\Domain\DTO\Builders\AppointmentRecordValidatorBuilder;
 use App\Domain\DTO\Data\AppointmentRecordData;
 use App\Domain\Entity\AppointmentRecord;
 use App\Domain\Entity\User;
@@ -14,17 +15,28 @@ use InvalidArgumentException;
 
 class RegisterAppointmentCase
 {
-    public function __construct(private AppointmentRecordRepository $appointmentRecordRepository, private RegisterTypeDAO $registerTypeRepository, private UserRepository $userRepository){}
+    public function __construct(private AppointmentRecordRepository $appointmentRecordRepository,
+                                private RegisterTypeDAO $registerTypeRepository,
+                                private UserRepository $userRepository,
+                                private ValidateAppointmentRegisterCase $validateAppointmentRegisterCase){}
 
     public function execute(AppointmentRecordBuilder $appointmentRecordBuilder): AppointmentRecordData
     {
-        $type = $this->validateAppointmentType($appointmentRecordBuilder->getAppointmentTypeId());
         $user = $this->validateUser($appointmentRecordBuilder->getUserId());
+
+        $registerBuilder = new AppointmentRecordValidatorBuilder(
+            $user,
+            $appointmentRecordBuilder->getDate(),
+            $appointmentRecordBuilder->getTime(),
+        );
+        $registerType = $this->validateAppointmentRegisterCase->execute(
+        $registerBuilder
+        );
 
         $appointmentRecord = new AppointmentRecord(
           null,
             $user,
-            $type,
+            $registerType,
             $appointmentRecordBuilder->getDate(),
             $appointmentRecordBuilder->getTime(),
             null
@@ -32,17 +44,6 @@ class RegisterAppointmentCase
 
         $newAppointmentRecord = $this->appointmentRecordRepository->saveRecord($appointmentRecord);
         return new AppointmentRecordData($newAppointmentRecord);
-    }
-    public function validateAppointmentType($typeId): RegisterType
-    {
-        if(empty($typeId)){
-            throw new InvalidArgumentException("Appointment type ID cannot be empty.");
-        }
-        $AppointmentType = $this->registerTypeRepository->getRegisterTypeById($typeId);
-        if(!$AppointmentType){
-            throw new InvalidArgumentException("Appointment type with ID {$typeId} does not exist.");
-        }
-        return $AppointmentType;
     }
     public function validateUser($userId): User
     {
