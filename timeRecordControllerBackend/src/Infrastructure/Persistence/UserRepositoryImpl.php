@@ -88,22 +88,27 @@ class UserRepositoryImpl extends PersistenceRepository implements UserRepository
     {
         try {
             $this->pdo->beginTransaction();
-            $stmt = $this->pdo->prepare("INSERT INTO users (nome, matricula, senha, perfil_id, jornada_trabalho_id) 
-                                      VALUES (:nome, :matricula, :senha, :perfil_id, :jornada_trabalho_id)");
-            $stmt->bindParam(':nome', $user->getName());
-            $stmt->bindParam(':matricula', $user->getMatricula());
-            $stmt->bindParam(':senha', $user->getPassword());
-            $stmt->bindParam(':perfil_id', $user->getProfile()->getId(), PDO::PARAM_INT);
-            $stmt->bindParam(':jornada_trabalho_id', $user->getWorkJourney()->getId(), PDO::PARAM_INT);
+            $stmt = $this->pdo->prepare("INSERT INTO users (nome, matricula, senha, perfil_id, jornadaTrabalho_id) 
+                                      VALUES (:nome, :matricula, :senha, :perfil_id, :jornadaTrabalho_id)");
+
+            $name = $user->getName();
+            $matricula = $user->getMatricula();
+            $password = $user->getPassword();
+            $profileId = $user->getProfile()->getId();
+            $workJourneyId = $user->getWorkJourney()->getId();
+            $stmt->bindParam(':nome', $name);
+            $stmt->bindParam(':matricula', $matricula);
+            $stmt->bindParam(':senha', $password);
+            $stmt->bindParam(':perfil_id', $profileId, PDO::PARAM_INT);
+            $stmt->bindParam(':jornadaTrabalho_id', $workJourneyId, PDO::PARAM_INT);
             $stmt->execute();
-            $this->pdo->commit();
             $user->setId($this->pdo->lastInsertId());
-            if (empty($user->getId())) {
-                throw new \DomainException("User with ID {$user->getId()} was not be created.");
-            }
+            $user->setCreatedAt(new \DateTime());
+            $this->pdo->commit();
             return $user;
         } catch (\Exception $exception) {
             $this->pdo->rollBack();
+            throw new \DomainException("User with ID {$user->getId()} could not be saved.");
         }
     }
 
@@ -125,20 +130,28 @@ class UserRepositoryImpl extends PersistenceRepository implements UserRepository
         }
     }
 
-    public function update(User $user): void
+    public function update(User $user): User
     {
         try {
-            $stmt = $this->pdo->prepare("UPDATE users SET nome = :nome, senha = :senha, perfil_id = :perfil_id, jornada_trabalho_id = :jornada_trabalho_id WHERE id = :id");
-            $stmt->bindParam(':id', $user->getId(), PDO::PARAM_INT);
-            $stmt->bindParam(':nome', $user->getName());
-            $stmt->bindParam(':senha', $user->getPassword());
-            $stmt->bindParam(':perfil_id', $user->getProfile()->getId(), PDO::PARAM_INT);
-            $stmt->bindParam(':jornada_trabalho_id', $user->getWorkJourney()->getId(), PDO::PARAM_INT);
-            if (!$stmt->execute()) {
-                throw new \DomainException("User with ID {$user->getId()} could not be updated.");
-            }
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare("UPDATE users SET nome = :nome, senha = :senha, perfil_id = :perfil_id, jornadaTrabalho_id = :jornadaTrabalho_id WHERE id = :id");
+            $id = $user->getId();
+            $name = $user->getName();
+            $matricula = $user->getMatricula();
+            $password = $user->getPassword();
+            $profileId = $user->getProfile()->getId();
+            $workJourneyId = $user->getWorkJourney()->getId();
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':nome', $name);
+            $stmt->bindParam(':senha', $password);
+            $stmt->bindParam(':perfil_id', $profileId , PDO::PARAM_INT);
+            $stmt->bindParam(':jornadaTrabalho_id', $workJourneyId, PDO::PARAM_INT);
+            $stmt->execute();
+            $this->pdo->commit();
+            return $user;
         } catch (\Exception $exception) {
             $this->pdo->rollBack();
+            throw new \DomainException("User with ID {$id} could not be updated.");
         }
     }
 }

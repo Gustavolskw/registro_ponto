@@ -5,10 +5,12 @@ namespace App\Infrastructure\DAO;
 use App\Domain\Interfaces\AppointmentRecordRepository;
 use App\Domain\Interfaces\WorkJourneyDAO;
 use App\Domain\ValueObject\WorkJourney;
+use App\Infrastructure\ObjectBuilder\ObjectBuilderTrait;
 use App\Infrastructure\Persistence\PersistenceRepository;
 
 class WorkJourneyDAOImpl extends PersistenceRepository implements WorkJourneyDAO
 {
+    use ObjectBuilderTrait;
     private $workJourneySql = "SELECT jornada_trabalho.id as jornada_trabalho_id, jornada_trabalho.entrada_manha, 
     jornada_trabalho.saida_manha, jornada_trabalho.entrada_tarde, jornada_trabalho.saida_tarde, 
     jornada_trabalho.created_at as jornada_trabalho_created_at
@@ -23,7 +25,7 @@ class WorkJourneyDAOImpl extends PersistenceRepository implements WorkJourneyDAO
         if (empty($result)) {
             throw new \Exception("Work journey with ID {$id} not found.");
         }
-        return new WorkJourney($result['jornada_trabalho_id'], $result);
+        return $this->buildWorkJouney($result['jornada_trabalho_id'], $result);
     }
 
     public function findAll(): array
@@ -33,7 +35,7 @@ class WorkJourneyDAOImpl extends PersistenceRepository implements WorkJourneyDAO
         if (!empty($results)) {
             return array_map(
                 function ($item) {
-                    return new WorkJourney($item['jornada_trabalho_id'], $item);
+                    return $this->buildWorkJouney($item['jornada_trabalho_id'], $item);
                 },
                 $results
             );

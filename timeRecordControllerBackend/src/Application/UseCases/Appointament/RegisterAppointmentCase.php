@@ -8,15 +8,12 @@ use App\Domain\DTO\Data\AppointmentRecordData;
 use App\Domain\Entity\AppointmentRecord;
 use App\Domain\Entity\User;
 use App\Domain\Interfaces\AppointmentRecordRepository;
-use App\Domain\Interfaces\RegisterTypeDAO;
 use App\Domain\Interfaces\UserRepository;
-use App\Domain\ValueObject\RegisterType;
 use InvalidArgumentException;
 
 class RegisterAppointmentCase
 {
     public function __construct(private AppointmentRecordRepository $appointmentRecordRepository,
-                                private RegisterTypeDAO $registerTypeRepository,
                                 private UserRepository $userRepository,
                                 private ValidateAppointmentRegisterCase $validateAppointmentRegisterCase){}
 

@@ -7,14 +7,12 @@ use DateTime;
 class AppointmentRecordBuilder
 {
     private int $userId;
-    private int $appointmentTypeId;
     private DateTime $date;
     private DateTime $time;
 
-    public function __construct($userId, int $appointmentTypeId, DateTime $date, DateTime $time)
+    public function __construct($userId, DateTime $date, DateTime $time)
     {
         $this->userId = $userId;
-        $this->appointmentTypeId = $appointmentTypeId;
         $this->date = $date;
         $this->time = $time;
     }
@@ -23,12 +21,6 @@ class AppointmentRecordBuilder
     {
         return $this->userId;
     }
-
-    public function getAppointmentTypeId(): int
-    {
-        return $this->appointmentTypeId;
-    }
-
     public function getDate(): DateTime
     {
         return $this->date;

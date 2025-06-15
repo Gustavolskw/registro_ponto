@@ -31,8 +31,8 @@ class ValidateAppointmentRegisterCase
         $matchedRegisterType = null;
 
         foreach ($registerTypes as $registerType) {
-            $start = $registerType->getJanelaInicio()->format('H:i:s');
-            $end = $registerType->getJanelaFim()->format('H:i:s');
+            $start = $registerType->getStartWindow()?->format('H:i:s');
+            $end = $registerType->getEndWindow()?->format('H:i:s');
 
             // Tipos extras que não têm janela são ignorados nessa lógica
             if (!$start || !$end) {

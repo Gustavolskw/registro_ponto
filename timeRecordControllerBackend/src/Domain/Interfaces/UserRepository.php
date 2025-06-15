@@ -15,6 +15,6 @@ interface UserRepository
     public function save(User $user): User;
     public function inactivate(int $id): void;
     public function reactivate(int $id): void;
-    public function update(User $user): void;
+    public function update(User $user): User;
 
 }

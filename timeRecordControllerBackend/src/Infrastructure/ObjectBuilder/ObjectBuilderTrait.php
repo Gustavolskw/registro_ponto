@@ -41,7 +41,7 @@ trait ObjectBuilderTrait
     {
         return new Profile(
             $profileId,
-            $data['descricao'] ?? null
+            $data['descricao']
         );
     }
 
@@ -55,7 +55,7 @@ trait ObjectBuilderTrait
             $registerType,
             new DateTime($data['data'])?? null,
             new DateTime($data['horario'])?? null,
-            $data['appointment_record_created_at'] ?? null
+            new DateTime($data['appointment_record_created_at'])??null
         );
     }
     public function buildRegisterType(int  $registerTypeId, array $data): RegisterType
@@ -64,8 +64,8 @@ trait ObjectBuilderTrait
             $registerTypeId,
             $data['nome'] ?? null,
             $data['ordem'] ?? null,
-            new DateTime($data['janela_inicio'])?? null,
-            new DateTime($data['janela_fim']) ?? null,
+            !empty($data['janela_inicio']) ? new DateTime($data['janela_inicio']) : null,
+            !empty($data['janela_fim']) ? new DateTime($data['janela_fim']) : null,
             $data['exige_validacao'] ?? null,
             new DateTime($data['tipos_registro_created_at']) ?? null
         );

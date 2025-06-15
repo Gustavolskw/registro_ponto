@@ -9,23 +9,23 @@ use DateTimeInterface;
 class User
 {
 
-    private int $id;
+    private int|null $id;
     private int $matricula;
     private string $name;
-    private string $password;
+    private string|null $password;
     private Profile  $profile;
     private WorkJourney $workJourney;
-    private DateTimeInterface $createdAt;
+    private DateTimeInterface|null $createdAt;
 
-    public function __construct(?int $id, int $matricula,  string $name, string $password, Profile $profile, WorkJourney $workJourney,  ?DateTimeInterface $createdAt)
+    public function __construct(?int $id, int $matricula,  string $name, ?string $password, Profile $profile, WorkJourney $workJourney,  ?DateTimeInterface $createdAt)
     {
-        $this->id = $id;
+        $this->id = $id??null;
         $this->matricula = $matricula;
         $this->name = $name;
-        $this->password = $password;
+        $this->password = $password??null;
         $this->profile = $profile;
         $this->workJourney = $workJourney;
-        $this->createdAt = $createdAt;
+        $this->createdAt = $createdAt??null;
     }
 
     public function getId(): int
@@ -43,7 +43,7 @@ class User
         return $this->name;
     }
 
-    public function getPassword(): string
+    public function getPassword(): string|null
     {
         return $this->password;
     }
@@ -81,4 +81,10 @@ class User
     {
         $this->password = $password;
     }
+
+    public function setCreatedAt(?DateTimeInterface $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
 }

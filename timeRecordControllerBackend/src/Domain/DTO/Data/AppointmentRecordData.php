@@ -24,9 +24,10 @@ class AppointmentRecordData
             'appointmentType' => [
                 'id' => $this->appointmentRecord->getRegisterType()->getId(),
                 'description' => $this->appointmentRecord->getRegisterType()->getName(),
+                'ordem'=> $this->appointmentRecord->getRegisterType()->getOrder()
             ],
-            'date' => $this->appointmentRecord->getDate(),
-            'time' => $this->appointmentRecord->getTime(),
+            'date' => $this->appointmentRecord->getDate()->format('Y-m-d'),
+            'time' => $this->appointmentRecord->getTime()->format('H:i:s'),
         ];
     }
 

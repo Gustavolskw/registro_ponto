@@ -35,19 +35,17 @@ class RoleMiddleware implements MiddlewareInterface
 
         try {
             $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
-
-            // Aqui é onde corrigimos para ler o atributo correto 'role'
-            if (!in_array($decoded->role ?? null, $this->allowedProfiles, true)) {
-                throw new UnauthorizedException('Perfil não autorizado.');
-            }
-
-            // Opcionalmente, passa o payload para os controllers
-            $request = $request->withAttribute('user', $decoded);
-
-            return $handler->handle($request);
-
         } catch (\Exception $e) {
             throw new UnauthorizedException('Token inválido ou expirado.');
         }
+
+        if (!in_array($decoded->role ?? null, $this->allowedProfiles, true)) {
+            throw new UnauthorizedException('Perfil não autorizado.');
+        }
+
+        $request = $request->withAttribute('user', $decoded);
+
+        return $handler->handle($request);
     }
 }
+

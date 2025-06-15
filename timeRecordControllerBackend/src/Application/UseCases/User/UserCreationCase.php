@@ -37,24 +37,24 @@ class UserCreationCase
         $newUser = $this->userRepository->save(
             $newUserData
         );
-        $jwtToken = $this->generateJwt($user);
-        return new AuthUser($newUser, $jwtToken, $newWorkJourney);
+        $jwtToken = $this->generateJwt($newUser);
+        return new AuthUser($newUser, $jwtToken);
     }
     private function validateProfileType($profileId):Profile
     {
-        if(!empty($profileId)){
+        if(empty($profileId)){
             throw new ArgumentsException('Profile data cannot be empty');
         }
-        return $this->profileDAO->getProfileById($profileId->getId());
+        return $this->profileDAO->getProfileById($profileId);
     }
 
     private function validateWorkJourney($idJornadaTrabalho):WorkJourney
     {
-        if(!empty($idJornadaTrabalho)){
+        if(empty($idJornadaTrabalho)){
             throw new ArgumentsException('Work journey data cannot be empty');
         }
         $workJourney = $this->workJourneyDAO->findById($idJornadaTrabalho);
-        if(!$workJourney){
+        if(empty($workJourney)){
             throw new ArgumentsException('Work journey not found');
         }
         return $workJourney;

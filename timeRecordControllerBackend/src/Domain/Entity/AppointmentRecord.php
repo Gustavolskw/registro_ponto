@@ -8,12 +8,12 @@ use DateTimeInterface;
 
 class AppointmentRecord
 {
-    private int $id;
+    private int|null $id;
     private User $user;
     private RegisterType  $registerType;
     private DateTime $date;
     private DateTime $time;
-    private DateTimeInterface $createdAt;
+    private DateTimeInterface|null $createdAt;
 
     public function __construct(
         ?int $id,
@@ -23,12 +23,12 @@ class AppointmentRecord
         DateTime $time,
         ?DateTimeInterface $createdAt
     ) {
-        $this->id = $id;
+        $this->id = $id ?? null;
         $this->user = $user;
         $this->registerType = $registerType;
         $this->date = $date;
         $this->time = $time;
-        $this->createdAt = $createdAt;
+        $this->createdAt = $createdAt??null;
     }
 
     public function getId(): int
@@ -46,19 +46,19 @@ class AppointmentRecord
         return $this->registerType;
     }
 
-    public function getDate(): string
+    public function getDate(): DateTime
     {
-        return $this->date->format('Y-m-d');
+        return $this->date;
     }
 
-    public function getTime(): string
+    public function getTime(): DateTime
     {
-        return $this->time->format('H:i:s');
+        return $this->time;
     }
 
-    public function getCreatedAt(): string
+    public function getCreatedAt(): DateTime
     {
-        return $this->createdAt->format('Y-m-d H:i:s');
+        return $this->createdAt;
     }
 
     public function setUser(User $user): void
@@ -80,4 +80,10 @@ class AppointmentRecord
     {
         $this->time = $time;
     }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
 }

@@ -23,7 +23,7 @@ final class Version20250612022120 extends AbstractMigration
         $table->addColumn('id', 'bigint', ['autoincrement' => true]);
         $table->addColumn('matricula', 'bigint', ['notnull' => true]);
         $table->addColumn('nome', 'string', ['length' => 100]);
-        $table->addColumn('senha', 'text');
+        $table->addColumn('senha', 'text', ['notnull' => false]);
         $table->addColumn('perfil_id', 'bigint');
         $table->addForeignKeyConstraint('perfil', ['perfil_id'], ['id']);
         $table->addColumn('jornadaTrabalho_id', 'bigint', ['notnull' => false]);

@@ -33,6 +33,7 @@
         "monolog/monolog": "^2.8",
         "php-di/php-di": "^7.0",
         "slim/psr7": "^1.5",
+        "dompdf/dompdf": "^3.1",
         "slim/slim": "^4.10",
         "symfony/yaml": "^7.2",
         "vlucas/phpdotenv": "^5.6",

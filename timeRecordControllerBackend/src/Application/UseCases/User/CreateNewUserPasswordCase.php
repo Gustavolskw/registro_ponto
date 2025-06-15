@@ -22,9 +22,9 @@ class CreateNewUserPasswordCase
         $user = $this->validateUser($userId);
         $this->validateNewPassword($newPassword);
         $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
-        $this->userRepository->update($user);
-        $jwtToken = $this->generateJwt($user);
-        return new AuthUser($user, $jwtToken, null);
+        $userUpdated = $this->userRepository->update($user);
+        $jwtToken = $this->generateJwt($userUpdated);
+        return new AuthUser($user, $jwtToken);
     }
 
     public function validateUser(int $matricula): User

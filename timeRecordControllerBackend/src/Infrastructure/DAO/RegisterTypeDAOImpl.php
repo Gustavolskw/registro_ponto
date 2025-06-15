@@ -5,10 +5,12 @@ namespace App\Infrastructure\DAO;
 use App\Domain\Interfaces\AppointmentRecordRepository;
 use App\Domain\Interfaces\RegisterTypeDAO;
 use App\Domain\ValueObject\RegisterType;
+use App\Infrastructure\ObjectBuilder\ObjectBuilderTrait;
 use App\Infrastructure\Persistence\PersistenceRepository;
 
 class RegisterTypeDAOImpl extends PersistenceRepository implements RegisterTypeDAO
 {
+    use ObjectBuilderTrait;
     private $registerTypeSql = "SELECT tipos_registro.id as tipo_registro_id, tipos_registro.nome, tipos_registro.ordem, tipos_registro.janela_inicio , tipos_registro.janela_fim, tipos_registro.exige_validacao, tipos_registro.created_at as tipos_registro_created_at
 FROM tipos_registro";
 
@@ -19,7 +21,7 @@ FROM tipos_registro";
         if (!empty($results)) {
             return array_map(
                 function ($item) {
-                    return new RegisterType($item['tipo_registro_id'], $item);
+                    return $this->buildRegisterType($item['tipo_registro_id'], $item);
                 },
                 $results
             );
@@ -37,6 +39,6 @@ FROM tipos_registro";
         if (empty($result)) {
             throw new \Exception("Register type with ID {$id} not found.");
         }
-        return new RegisterType($result['tipo_registro_id'], $result);
+        return $this->buildRegisterType($result['tipo_registro_id'], $result);
     }
 }

@@ -31,7 +31,7 @@ class UserController extends Controller
         $body = $this->getFormData($request);
         $rules = [
             'name' => 'string',
-            'password' => 'required|string|min:6|max:255',
+            'password' => 'string|min:6|max:255',
             'profileId' => 'required|integer|in:1,2',
             'workJourneyId' => 'required|integer',
         ];

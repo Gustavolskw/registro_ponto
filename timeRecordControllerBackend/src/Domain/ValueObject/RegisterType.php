@@ -9,8 +9,8 @@ class RegisterType
     private int $id;
     private string $name;
     private int $order;
-    private DateTime $startWindow;
-    private DateTime $endWindow;
+    private DateTime|null $startWindow;
+    private DateTime|null $endWindow;
     private bool $requiresValidation;
     private DateTime $createdAt;
 
@@ -18,16 +18,16 @@ class RegisterType
         ?int $id,
         string $name,
         int $order,
-        DateTime $startWindow,
-        DateTime $endWindow,
+        ?DateTime $startWindow,
+        ?DateTime $endWindow,
         bool $requiresValidation,
         ?DateTime $createdAt
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->order = $order;
-        $this->startWindow = $startWindow;
-        $this->endWindow = $endWindow;
+        $this->startWindow = $startWindow??null;
+        $this->endWindow = $endWindow??null;
         $this->requiresValidation = $requiresValidation;
         $this->createdAt = $createdAt;
     }
@@ -47,12 +47,12 @@ class RegisterType
         return $this->order;
     }
 
-    public function getStartWindow(): DateTime
+    public function getStartWindow(): DateTime|null
     {
         return $this->startWindow;
     }
 
-    public function getEndWindow(): DateTime
+    public function getEndWindow(): DateTime|null
     {
         return $this->endWindow;
     }
