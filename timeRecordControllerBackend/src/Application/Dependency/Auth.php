@@ -14,8 +14,10 @@ trait Auth
         return [
             'iss' => 'appointment-system',
             'sub' => $user->getId(),
+            'name' => $user->getName(),
             'matricula' => $user->getMatricula(),
             'role' => $user->getProfile()->getId(),
+            'roleDescription' => $user->getProfile()->getDescription(),
             'iat' => time(),
             'exp' => time() + 3600,
         ];

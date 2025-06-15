@@ -20,12 +20,12 @@ FROM perfil";
     {
         $stmt = $this->pdo->query($this->profileSql);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (!empty($result)) {
+        if (!empty($results)) {
             return array_map(
                 function ($item) {
                     return $this->buildProfile($item['perfil_id'], $item);
                 },
-                $result
+                $results
             );
         }
         return [];

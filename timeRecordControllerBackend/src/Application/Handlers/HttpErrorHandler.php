@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Handlers;
 
+use App\Application\Domain\Exception\RegisterTimeAlreadyExistsException;
+use App\Application\Domain\Exception\RegisterTimeOutOfWindowException;
 use App\Domain\DomainException\ArgumentsValidationException;
 use App\Domain\DomainException\DomainException;
 use App\Domain\DomainException\DomainNotFoundException;
@@ -73,6 +75,16 @@ class HttpErrorHandler extends SlimErrorHandler
                 $errors = $exception->getErrors();
                 $error->setType(ErrorHandler::VALIDATION_ERROR);
                 $error->setDescription($errors);
+                $statusCode = 422;
+            }
+            else if ($exception instanceof RegisterTimeAlreadyExistsException ){
+                $error->setType(ErrorHandler::VALIDATION_ERROR);
+                $error->setDescription($exception->getMessage());
+                $statusCode = 422;
+            }
+            else if ($exception instanceof RegisterTimeOutOfWindowException ){
+                $error->setType(ErrorHandler::VALIDATION_ERROR);
+                $error->setDescription($exception->getMessage());
                 $statusCode = 422;
             }
             else {

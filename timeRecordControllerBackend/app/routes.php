@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Adapters\Controller\AppointingController;
+use App\Adapters\Controller\ProfileController;
 use App\Adapters\Controller\UserController;
+use App\Adapters\Controller\WorkJourneyController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -15,12 +17,10 @@ return function (App $app) {
         // CORS Pre-Flight OPTIONS Request Handler
         return $response;
     });
-
     $app->get('/', function (Request $request, Response $response) {
         $response->getBody()->write('Hello world!');
         return $response;
     });
-
     $app->group("/user", function (RouteCollectorProxy $group){
         $group->post("", UserController::class . ":createNewUser")->add(withRole([1]));
         $group->patch("", UserController::class . ":createFuncionarioPassword")->add(withRole([1, 2]));
@@ -32,5 +32,11 @@ return function (App $app) {
     });
     $app->group('', function (RouteCollectorProxy $group){
         $group->post('/login', UserController::class . ':loginUser');
+    });
+    $app->group('/profiles', function (RouteCollectorProxy $group){
+        $group->get('', ProfileController::class . ':getAllProfiles')->add(withRole([1, 2]));
+    });
+    $app->group('/workJourney', function (RouteCollectorProxy $group){
+        $group->get('', WorkJourneyController::class . ':getAllWorkJourneys')->add(withRole([1, 2]));
     });
 };

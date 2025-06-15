@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { User, Lock, School, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-    const [userType, setUserType] = useState('professor');
     const [matricula, setMatricula] = useState('');
     const [senha, setSenha] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -18,14 +19,37 @@ export default function Login() {
 
         setIsLoading(true);
 
-        // Simulação de login
-        setTimeout(() => {
-            console.log('Login:', { userType, matricula, senha });
-            alert(`Login realizado com sucesso como ${userType === 'admin' ? 'Administrador' : 'Professor'}!`);
+        try {
+            const response = await fetch("http://localhost:8080/login", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ matricula: matricula, password: senha }),
+            });
+            if (!response.ok) {
+                throw new Error('Erro ao fazer login');
+            }
+            const result = await response.json();
+            const token = result.data.jwtToken;
+            const user = result.data.user;
+            console.log(result);
+            console.log(token);
+            setUser(user);
+            setToken(token);
             setIsLoading(false);
-        }, 1500);
+            navigate('/home');
+        } catch (error) {
+            alert('Erro no login: ' + error.message);
+            setIsLoading(false);
+        }
     };
-
+    const setToken = (token) => {
+        localStorage.setItem('token', token);
+    };
+    const setUser = (user) => {
+        localStorage.setItem('user', JSON.stringify(user));
+    }
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
@@ -40,34 +64,6 @@ export default function Login() {
                     <p className="text-gray-600">
                         Controle de frequência escolar
                     </p>
-                </div>
-
-                {/* Seletor de tipo de usuário */}
-                <div className="mb-6">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
-                        <button
-                            type="button"
-                            onClick={() => setUserType('professor')}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                                userType === 'professor'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
-                            }`}
-                        >
-                            Professor
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setUserType('admin')}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                                userType === 'admin'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
-                            }`}
-                        >
-                            Administrador
-                        </button>
-                    </div>
                 </div>
 
                 {/* Formulário */}
@@ -87,7 +83,7 @@ export default function Login() {
                                 value={matricula}
                                 onChange={(e) => setMatricula(e.target.value)}
                                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                placeholder={userType === 'admin' ? 'Digite sua matrícula' : 'Digite sua matrícula'}
+                                placeholder='Digite sua matrícula'
                                 required
                             />
                         </div>
@@ -156,13 +152,18 @@ export default function Login() {
                 {/* Informações adicionais */}
                 <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                     <h3 className="text-sm font-medium text-gray-800 mb-2">
-                        {userType === 'admin' ? 'Acesso Administrativo' : 'Acesso do Professor'}
+                        Acesso Administrativo
                     </h3>
                     <p className="text-xs text-gray-600">
-                        {userType === 'admin'
-                            ? 'Como administrador, você terá acesso completo ao sistema para gerenciar professores e relatórios.'
-                            : 'Como professor, você poderá registrar sua entrada e saída durante o expediente.'
-                        }
+                        Como administrador, você terá acesso completo ao sistema para gerenciar Funcionários e relatórios.
+                    </p>
+                </div>
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-800 mb-2">
+                        Acesso do Professor
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                        Como professor, você poderá registrar sua entrada e saída durante o expediente.
                     </p>
                 </div>
             </div>

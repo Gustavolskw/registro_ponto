@@ -1,22 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home, ArrowLeft, Search, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotFoundPage() {
     const [isAnimating, setIsAnimating] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token);
+    }, []);
 
     const handleGoToLogin = () => {
         setIsAnimating(true);
-        // Simulate navigation delay
         setTimeout(() => {
-            console.log('Redirecting to login page...');
-            alert('Redirecting to login page...');
             setIsAnimating(false);
+            navigate('/login');
         }, 1000);
     };
 
-    const handleGoBack = () => {
-        console.log('Going back...');
-        window.history.back();
+    const handleGoToHome = () => {
+        setIsAnimating(true);
+        setTimeout(() => {
+            setIsAnimating(false);
+            navigate('/home');
+        }, 1000);
     };
 
     return (
@@ -42,16 +51,16 @@ export default function NotFoundPage() {
                     </div>
                 </div>
 
-                {/* Error Message */}
+                {/* Mensagem de Erro */}
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                        Oops! Page Not Found
+                        Ops! Página Não Encontrada
                     </h2>
                     <p className="text-gray-600 text-lg mb-2">
-                        The page you're looking for doesn't exist or has been moved.
+                        A página que você está procurando não existe ou foi movida.
                     </p>
                     <p className="text-gray-500">
-                        Don't worry, let's get you back on track!
+                        Não se preocupe, vamos te ajudar a voltar ao caminho certo!
                     </p>
                 </div>
 
@@ -62,43 +71,58 @@ export default function NotFoundPage() {
                     <div className="absolute -bottom-3 left-8 w-4 h-4 bg-indigo-400 rounded-full animate-bounce"></div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Botões de Ação */}
                 <div className="space-y-4">
-                    <button
-                        onClick={handleGoToLogin}
-                        disabled={isAnimating}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center group"
-                    >
-                        {isAnimating ? (
-                            <div className="flex items-center">
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                Redirecting...
-                            </div>
-                        ) : (
-                            <>
-                                <Home className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                                Go to Login Page
-                            </>
-                        )}
-                    </button>
+                    {!isLoggedIn && (
+                        <button
+                            onClick={handleGoToLogin}
+                            disabled={isAnimating}
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center group"
+                        >
+                            {isAnimating ? (
+                                <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Redirecionando...
+                                </div>
+                            ) : (
+                                <>
+                                    <Home className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                                    Ir para o Login
+                                </>
+                            )}
+                        </button>
+                    )}
 
-                    <button
-                        onClick={handleGoBack}
-                        className="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center group"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Go Back
-                    </button>
+                    {isLoggedIn && (
+                        <button
+                            onClick={handleGoToHome}
+                            disabled={isAnimating}
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center group"
+                        >
+                            {isAnimating ? (
+                                <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Redirecionando...
+                                </div>
+                            ) : (
+                                <>
+                                    <ArrowLeft className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                                    Voltar para Home
+                                </>
+                            )}
+
+                        </button>
+                    )}
                 </div>
 
-                {/* Additional Help */}
+                {/* Ajuda Adicional */}
                 <div className="mt-8 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-white/20">
                     <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center justify-center">
                         <Search className="w-4 h-4 mr-2" />
-                        Need Help?
+                        Precisa de Ajuda?
                     </h3>
                     <p className="text-xs text-gray-600">
-                        If you believe this is an error, please contact the system administrator or try refreshing the page.
+                        Se você acredita que isso é um erro, entre em contato com o administrador do sistema ou tente atualizar a página.
                     </p>
                 </div>
 
