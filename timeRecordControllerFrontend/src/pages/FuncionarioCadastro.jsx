@@ -48,10 +48,7 @@ export default function CadastroFuncionarioAdmin() {
             }
 
             const data = await response.json();
-            console.log(data)
             setPerfis(data.data);
-
-
             // Em desenvolvimento, usar mock
             // setPerfis(mockPerfis);
         } catch (error) {
@@ -99,6 +96,10 @@ export default function CadastroFuncionarioAdmin() {
 
     // Carregar dados iniciais
     useEffect(() => {
+        if(!localStorage.getItem('token')) {
+            navigate('/home');
+            return;
+        }
         const carregarDados = async () => {
             setIsLoadingData(true);
             await Promise.all([
@@ -124,9 +125,9 @@ export default function CadastroFuncionarioAdmin() {
             ...prev,
             [name]: value
         }));
-
         // Limpar erros quando usuario digita
         if (error) setError('');
+
     };
 
     const handleSubmit = async () => {
@@ -147,9 +148,8 @@ export default function CadastroFuncionarioAdmin() {
                 throw new Error('Jornada de trabalho é obrigatória');
             }
 
-            console.log("formData.perfilId" + formData.perfilId);
             // Se perfil não for "Funcionário" (ID 2), validar campos de senha
-            if (formData.perfilId === 1) {
+            if (formData.perfilId === '1') {
                 if (!formData.senha) {
                     throw new Error('Senha é obrigatória');
                 }
@@ -170,16 +170,14 @@ export default function CadastroFuncionarioAdmin() {
 
             // Preparar dados para envio
             const dadosFuncionario = {
-                nomeCompleto: formData.nomeCompleto.trim(),
-                email: formData.email.trim(),
-                matricula: formData.matricula,
-                perfilId: parseInt(formData.perfilId),
-                jornadaTrabalhoId: parseInt(formData.jornadaTrabalhoId),
+                name: formData.nomeCompleto.trim(),
+                password: formData.senha,
+                profileId: parseInt(formData.perfilId),
+                workJourneyId: parseInt(formData.jornadaTrabalhoId),
             };
 
-            console.log(dadosFuncionario)
 
-            const response = await fetch('http://localhost:8080/user/44', {
+            const response = await fetch('http://localhost:8080/user', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -196,7 +194,7 @@ export default function CadastroFuncionarioAdmin() {
             setSuccess(true);
 
             // Resetar formulário após 3 segundos
-            gerarMatricula(data.data.user.matricula);
+            gerarMatricula(data.data.matricula);
 
         } catch (error) {
             console.error('Erro no cadastro:', error);
@@ -207,15 +205,22 @@ export default function CadastroFuncionarioAdmin() {
     };
 
     // Verificar se deve mostrar campos de senha
-    const mostrarCamposSenha = formData.perfilId && formData.perfilId !== 2;
+    const mostrarCamposSenha = formData.perfilId && formData.perfilId !== '2';
 
-    console.log( formData.perfilId)
     // Verificar se formulário é válido
     const isFormValid = formData.nomeCompleto.trim() &&
         formData.perfilId &&
         formData.jornadaTrabalhoId &&
-        (formData.perfilId === 2 ||
-            (formData.senha && formData.confirmarSenha && formData.senha === formData.confirmarSenha));
+        (
+            formData.perfilId === '2' || // Se for funcionário, não precisa de senha
+            (
+                formData.senha &&
+                formData.confirmarSenha &&
+                formData.senha.length >= 8 &&
+                formData.senha === formData.confirmarSenha
+            )
+        );
+
 
     // Loading inicial
     if (isLoadingData) {
@@ -445,15 +450,23 @@ export default function CadastroFuncionarioAdmin() {
                             </button>
                         </div>
 
-                        {/* Botão Submit */}
+                        {/* Matricula de Novo Funcionario */}
                         <div className="pt-6">
                             {matriculaData && (
-                                <>
-                                    <div className="border-t pt-6">
-                                        <h3 className="text-lg font-medium text-gray-800 mb-4">Matricula do Novo Usuario:</h3>
-                                        <p>{matriculaData}</p>
+                                <div className="mt-8">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+                                        <h3 className="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+                                            <User className="w-5 h-5 mr-2 text-blue-600" />
+                                            Matrícula do Novo Usuário
+                                        </h3>
+                                        <p className="text-blue-700 text-2xl font-bold tracking-wide">
+                                            {matriculaData}
+                                        </p>
+                                        <p className="text-sm text-blue-600 mt-1">
+                                            Informe esta matrícula ao funcionário para que ele possa acessar o sistema.
+                                        </p>
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>

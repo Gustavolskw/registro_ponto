@@ -52,19 +52,19 @@ class AppointingController extends Controller
         return $this->respondWithData($response, array_map(fn($dto) => $dto->toArray(), $appointmentsData));
     }
 
-    public function generateGeneralReportOfDay(Request $request, Response $response)
+    public function generateGeneralReportOfDay(Request $request, Response $response, mixed $args)
     {
-        $body = $this->getFormData($request);
+        $dateFromClient = $request->getQueryParams()['date'] ?? null;
         $rules = [
             'date' => 'required|date',
         ];
 
-        $validator = $this->validator->make($body, $rules, ValidationMessages::getMessages());
+        $validator = $this->validator->make(['date' => $dateFromClient], $rules, ValidationMessages::getMessages());
         if ($validator->fails()) {
             throw new ArgumentsValidationException($validator->errors()->toArray());
         }
-        $validatedData = $validator->validated();
-        $date = new DateTime($validatedData['date']);
+
+        $date = new DateTime($dateFromClient);
         $pdfContent = $this->exportGeneralReportOfDay->execute($date);
 
         $filename = 'relatorio-geral-' . $date->format('Y-m-d') . '.pdf';

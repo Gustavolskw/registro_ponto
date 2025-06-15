@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { User, Lock, School, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,6 +49,15 @@ export default function Login() {
     };
     const setUser = (user) => {
         localStorage.setItem('user', JSON.stringify(user));
+    }
+    useEffect(() => {
+        if(localStorage.getItem('token')) {
+            navigate('/home');
+        }
+    }, []);
+
+    const handlePasswordRegister = () => {
+        navigate('/cadastro/new/user/password');
     }
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -141,12 +150,12 @@ export default function Login() {
 
                 {/* Link de ajuda */}
                 <div className="mt-6 text-center">
-                    <a
-                        href="#"
+                    <button
+                        onClick={handlePasswordRegister}
                         className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                        Esqueceu sua senha?
-                    </a>
+                        Usuario novo? Clique aqui para cadastrar sua senha
+                    </button>
                 </div>
 
                 {/* Informações adicionais */}

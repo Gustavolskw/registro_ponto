@@ -44,50 +44,38 @@ export default function CadastroSenhaFuncionario() {
         setPasswordValidation(validation);
         return Object.values(validation).every(v => v);
     };
-
-    // Verificar se funcionário existe e precisa cadastrar senha
-    const verificarFuncionario = async (matricula) => {
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/funcionario/verificar-pendencia/${matricula}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Matrícula não encontrada ou já possui senha cadastrada');
-            }
-
-            const data = await response.json();
-            return data; // Deve retornar dados básicos do funcionário
-        } catch (error) {
-            throw new Error(error.message || 'Erro ao verificar matrícula');
-        }
-    };
-
     // Cadastrar nova senha
     const cadastrarSenha = async (dados) => {
         try {
-            const response = await fetch('http://localhost:8080/api/funcionario/cadastrar-senha', {
-                method: 'POST',
+            const response = await fetch('http://localhost:8080/user', {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(dados)
             });
 
+            const data = await response.json();
             if (!response.ok) {
                 const errorData = await response.json();
+                console.log(errorData);
                 throw new Error(errorData.message || 'Erro ao cadastrar senha');
             }
+            setToken(data.data.jwtToken);
+            setUser(data.data.user);
 
-            return await response.json();
+            return await data;
         } catch (error) {
             throw new Error(error.message || 'Erro ao cadastrar senha');
         }
     };
+    const setToken = (token) => {
+        localStorage.setItem('token', token);
+
+    }
+    const setUser = (user) => {
+        localStorage.setItem('user', JSON.stringify(user));
+    }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -128,21 +116,15 @@ export default function CadastroSenhaFuncionario() {
                 throw new Error('Senhas não conferem');
             }
 
-            // Verificar se funcionário existe e precisa cadastrar senha
-            await verificarFuncionario(formData.matricula);
-
             // Cadastrar senha
             await cadastrarSenha({
                 matricula: formData.matricula,
-                senha: formData.senha
+                password: formData.senha
             });
 
             setSuccess(true);
 
-            // Redirecionar para login após 3 segundos
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 3000);
+          navigate('/home');
 
         } catch (error) {
             console.error('Erro no cadastro:', error);

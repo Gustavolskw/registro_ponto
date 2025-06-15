@@ -147,8 +147,6 @@ export default function FuncionarioRegistroPonto() {
                 //time: '18:14:00',
 
             }
-            console.log(dadosRegistro)
-
             const response = await fetch('http://localhost:8080/appointment/mark', {
                 method: 'POST',
                 headers: {
@@ -185,6 +183,10 @@ export default function FuncionarioRegistroPonto() {
 
     // Carregar dados iniciais
     useEffect(() => {
+        if(!localStorage.getItem('token')) {
+            navigate('/login');
+            return;
+        }
         const carregarDados = async () => {
             setIsLoadingData(true);
             await Promise.all([
@@ -425,7 +427,7 @@ export default function FuncionarioRegistroPonto() {
                 {adminValidation() && (
                     <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 mt-4">
                         <button
-                            onClick={() => console.log('Emitir relatório geral')}
+                            onClick={() => navigate('/relatorios/geral')}
                             className="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors"
                         >
                             <Calendar className="w-5 h-5 mr-2" />

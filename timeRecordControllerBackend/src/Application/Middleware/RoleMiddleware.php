@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Middleware;
 
+use App\Application\Domain\Exception\JWTTokenNotFoundException;
+use App\Application\Domain\Exception\UnauthenticatedException;
 use App\Domain\Exception\UnauthorizedException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -28,7 +30,7 @@ class RoleMiddleware implements MiddlewareInterface
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            throw new UnauthorizedException('Token não fornecido.');
+            throw new JWTTokenNotFoundException('Token não fornecido.');
         }
 
         $token = str_replace('Bearer ', '', $authHeader);
@@ -36,7 +38,7 @@ class RoleMiddleware implements MiddlewareInterface
         try {
             $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
         } catch (\Exception $e) {
-            throw new UnauthorizedException('Token inválido ou expirado.');
+            throw new UnauthenticatedException('Token inválido ou expirado.');
         }
 
         if (!in_array($decoded->role ?? null, $this->allowedProfiles, true)) {

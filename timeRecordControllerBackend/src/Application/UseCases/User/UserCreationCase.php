@@ -8,6 +8,7 @@ use App\Domain\DomainException\ArgumentsException;
 use App\Domain\DTO\Builders\ProfileBuilder;
 use App\Domain\DTO\Builders\UserBuilder;
 use App\Domain\DTO\Data\AuthUser;
+use App\Domain\DTO\Data\UserData;
 use App\Domain\Entity\User;
 use App\Domain\Interfaces\ProfileDAO;
 use App\Domain\Interfaces\UserRepository;
@@ -21,7 +22,7 @@ class UserCreationCase
     public function __construct(private UserRepository $userRepository, private ProfileDAO $profileDAO, private WorkJourneyDAO $workJourneyDAO)
     {
     }
-    public function execute(UserBuilder $userData):AuthUser
+    public function execute(UserBuilder $userData):AuthUser|UserData
     {
         $profileData = $this->validateProfileType($userData->getProfileId());
         $workJourney = $this->validateWorkJourney($userData->getWorkJourneyId());
@@ -37,8 +38,12 @@ class UserCreationCase
         $newUser = $this->userRepository->save(
             $newUserData
         );
-        $jwtToken = $this->generateJwt($newUser);
-        return new AuthUser($newUser, $jwtToken);
+        if($profileData->getId() == 1) {
+            $jwtToken = $this->generateJwt($newUser);
+            return new AuthUser($newUser, $jwtToken);
+        }
+        return new UserData($newUser);
+
     }
     private function validateProfileType($profileId):Profile
     {

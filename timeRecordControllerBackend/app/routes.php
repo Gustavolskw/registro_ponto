@@ -23,7 +23,7 @@ return function (App $app) {
     });
     $app->group("/user", function (RouteCollectorProxy $group){
         $group->post("", UserController::class . ":createNewUser")->add(withRole([1]));
-        $group->patch("", UserController::class . ":createFuncionarioPassword")->add(withRole([1, 2]));
+        $group->patch("", UserController::class . ":createFuncionarioPassword");
     });
     $app->group("/appointment", function (RouteCollectorProxy $group){
         $group->post("/mark", AppointingController::class . ":markAppointment")->add(withRole([1, 2]));

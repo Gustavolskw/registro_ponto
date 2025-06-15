@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\Handlers;
 
+use App\Application\Domain\Exception\JWTTokenNotFoundException;
 use App\Application\Domain\Exception\RegisterTimeAlreadyExistsException;
 use App\Application\Domain\Exception\RegisterTimeOutOfWindowException;
+use App\Application\Domain\Exception\UnauthenticatedException;
 use App\Domain\DomainException\ArgumentsValidationException;
 use App\Domain\DomainException\DomainException;
 use App\Domain\DomainException\DomainNotFoundException;
+use App\Domain\Exception\UnauthorizedException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpException;
@@ -86,6 +89,21 @@ class HttpErrorHandler extends SlimErrorHandler
                 $error->setType(ErrorHandler::VALIDATION_ERROR);
                 $error->setDescription($exception->getMessage());
                 $statusCode = 422;
+            }
+            else if ($exception instanceof JWTTokenNotFoundException ){
+                $error->setType("JWT_TOKEN_NOT_FOUND_EXCEPTION");
+                $error->setDescription($exception->getMessage());
+                $statusCode = 400;
+            }
+            else if ($exception instanceof UnauthenticatedException ){
+                $error->setType(ErrorHandler::UNAUTHENTICATED);
+                $error->setDescription($exception->getMessage());
+                $statusCode = 403;
+            }
+            else if ($exception instanceof UnauthorizedException ){
+                $error->setType("UNAUTHORIZED_EXCEPTION");
+                $error->setDescription($exception->getMessage());
+                $statusCode = 401;
             }
             else {
                 $error->setDescription($exception->getMessage());
