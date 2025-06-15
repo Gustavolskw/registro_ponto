@@ -33,6 +33,19 @@ services:
       - mysql
     networks:
       - time-record-app
+  time-record-controller-frontend:
+    build:
+      context: ./timeRecordControllerFrontend
+      dockerfile: Dockerfile
+    container_name: time-record-controller-frontend
+    ports:
+      - "8081:5173"
+    volumes:
+      - ./timeRecordControllerFrontend:/app
+    depends_on:
+      - time-record-controller-backend
+    networks:
+      - time-record-app
 networks:
   time-record-app:
     driver: bridge
