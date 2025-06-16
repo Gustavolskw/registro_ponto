@@ -171,68 +171,6 @@ export default function FuncionarioRegistroPonto() {
         return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
     };
 
-    const registrarPonto = async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Token não encontrado');
-            }
-            const response = await fetch('http://localhost:8080/appointment/mark', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            const responseData = await response.json();
-
-            if (!response.ok) {
-                throw new Error(`Erro ${responseData.statusCode}: ${responseData.error.description}`);
-            }
-            // Registro bem-sucedido, atualiza registros do dia
-            await buscarRegistrosDia();
-
-
-        } catch (error) {
-            console.error('Erro ao registrar ponto:', error);
-            setError(`Erro ao registrar ponto: ${error.message}`);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-
-    useEffect(() => {
-        if(!localStorage.getItem('token')) {
-            navigate('/login');
-            return;
-        }
-        const carregarDados = async () => {
-            setIsLoadingData(true);
-            await Promise.all([
-                buscarDadosFuncionario(),
-                buscarRegistrosDia()
-            ]);
-            setIsLoadingData(false);
-        };
-
-        carregarDados();
-    }, []);
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, []);
-
-
-
     const calcularHorasTrabalhadas = () => {
         let totalMinutos = 0;
         let ultimaEntrada = null;
@@ -309,6 +247,70 @@ export default function FuncionarioRegistroPonto() {
     };
 
     const proximaAcao = determinarProximaAcao();
+
+    const registrarPonto = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Token não encontrado');
+            }
+            const response = await fetch('http://localhost:8080/appointment/mark', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`Erro ${responseData.statusCode}: ${responseData.error.description}`);
+            }
+            // Registro bem-sucedido, atualiza registros do dia
+            await buscarRegistrosDia();
+
+
+        } catch (error) {
+            console.error('Erro ao registrar ponto:', error);
+            setError(`Erro ao registrar ponto: ${error.message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        if(!localStorage.getItem('token')) {
+            navigate('/login');
+            return;
+        }
+        const carregarDados = async () => {
+            setIsLoadingData(true);
+            await Promise.all([
+                buscarDadosFuncionario(),
+                buscarRegistrosDia()
+            ]);
+            setIsLoadingData(false);
+        };
+
+        carregarDados();
+    }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+
+
+
 
     if (isLoadingData) {
         return (
