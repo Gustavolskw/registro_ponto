@@ -7,8 +7,6 @@ else
   echo "$(date "+%Y-%m-%d %H:%M:%S") INFO Dependências já instaladas."
 fi
 sleep 6
-#echo "$(date "+%Y-%m-%d %H:%M:%S") INFO Executando testes automatizados..."
-#vendor/bin/phpunit --testsuite=unit --testdox
 
 echo "$(date "+%Y-%m-%d %H:%M:%S") INFO Executando migrações do banco de dados..."
 php /var/www/html/vendor/bin/doctrine-migrations migrations:migrate --no-interaction

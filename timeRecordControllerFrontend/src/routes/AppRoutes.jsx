@@ -15,7 +15,6 @@ export default function AppRoutes() {
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro/funcionario" element={<FuncionarioCadastro />} />
             <Route path="/cadastro/new/user/password" element={<NewUserFirstLogin />} />
-            <Route path="/cadastro/admin/auth/new/user" element={<FuncionarioCadastro />} />
             <Route path="/relatorios/geral" element={<RelatorioGeral />} />
             <Route path="*" element={<NotFound />} />
         </Routes>

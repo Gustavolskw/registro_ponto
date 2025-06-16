@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Lock, Eye, EyeOff, Save, ArrowLeft, UserPlus, Clock, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from "jwt-decode";
 
 export default function CadastroFuncionarioAdmin() {
     const navigate = useNavigate();
@@ -99,6 +100,11 @@ export default function CadastroFuncionarioAdmin() {
         if(!localStorage.getItem('token')) {
             navigate('/home');
             return;
+        }
+        const token = localStorage.getItem('token');
+        const decoded = jwtDecode(token);
+        if(decoded.role !== 1){
+            navigate('/home');
         }
         const carregarDados = async () => {
             setIsLoadingData(true);

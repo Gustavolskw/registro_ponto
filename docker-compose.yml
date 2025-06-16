@@ -39,7 +39,7 @@ services:
       dockerfile: Dockerfile
     container_name: time-record-controller-frontend
     ports:
-      - "8081:5173"
+      - "80:5173"
     volumes:
       - ./timeRecordControllerFrontend:/app
     depends_on:

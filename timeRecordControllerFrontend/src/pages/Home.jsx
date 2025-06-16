@@ -24,13 +24,9 @@ export default function FuncionarioRegistroPonto() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-
-    // Estado para dados do funcionário autenticado
     const [funcionario, setFuncionario] = useState(null);
 
-    // Estado para registros de ponto do dia
     const [registros, setRegistros] = useState([]);
-
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -64,7 +60,6 @@ export default function FuncionarioRegistroPonto() {
         }
     };
 
-    // Função para buscar registros de ponto do dia atual
     const buscarRegistrosDia = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -126,7 +121,56 @@ export default function FuncionarioRegistroPonto() {
         }
     };
 
-    // Função para registrar ponto
+    const determinarProximaAcao = () => {
+        const agora = new Date();
+        const horaAtual = agora.getHours();
+        const minutosAtuais = agora.getMinutes();
+        const horarioAtual = `${horaAtual.toString().padStart(2, '0')}:${minutosAtuais.toString().padStart(2, '0')}`;
+
+        const dentroDaJanela = (inicio, fim) => horarioAtual >= inicio && horarioAtual <= fim;
+        const temRegistro = (tipo) => registros.some(r => r.tipo === tipo);
+        const jornadaCompleta = () => registros.some(r => r.tipo === 'saida_extra');
+
+        // ✅ Verificação prioritária: jornada já finalizada
+        if (jornadaCompleta()) {
+            return {
+                tipo: 'jornada_finalizada',
+                label: 'Jornada Finalizada',
+                icon: Clock,
+                color: 'gray'
+            };
+        }
+
+        // ✅ Janela extra (pós 18:15)
+        if (horarioAtual > '18:15') {
+            if (temRegistro('entrada_extra')) {
+                return { tipo: 'saida_extra', label: 'Saída da Hora Extra', icon: LogOut, color: 'indigo' };
+            } else {
+                return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
+            }
+        }
+
+        // ✅ Janelas normais
+        if (dentroDaJanela('07:45', '08:15') && !temRegistro('entrada')) {
+            return { tipo: 'entrada', label: 'Registrar Entrada', icon: LogIn, color: 'green' };
+        }
+
+        if (dentroDaJanela('11:45', '12:15') && !temRegistro('saida_almoco')) {
+            return { tipo: 'saida_almoco', label: 'Saída para Almoço', icon: Coffee, color: 'orange' };
+        }
+
+        if (dentroDaJanela('13:45', '14:15') && !temRegistro('volta_almoco')) {
+            return { tipo: 'volta_almoco', label: 'Volta do Almoço', icon: Coffee, color: 'blue' };
+        }
+
+        if (dentroDaJanela('17:45', '18:15') && !temRegistro('saida')) {
+            return { tipo: 'saida', label: 'Registrar Saída', icon: LogOut, color: 'red' };
+        }
+
+        // ✅ Se nada for aplicável, default para entrada extra (fora de janelas e sem saída extra ainda registrada)
+        return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
+    };
+
     const registrarPonto = async () => {
         setIsLoading(true);
         setError(null);
@@ -136,24 +180,12 @@ export default function FuncionarioRegistroPonto() {
             if (!token) {
                 throw new Error('Token não encontrado');
             }
-
-            const agora = new Date();
-            const date = agora.toISOString().split('T')[0];
-            const time = currentTime.toTimeString().split(' ')[0];
-
-            const dadosRegistro = {
-                date: date,
-                time: time
-                //time: '18:14:00',
-
-            }
             const response = await fetch('http://localhost:8080/appointment/mark', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(dadosRegistro)
             });
 
             const responseData = await response.json();
@@ -164,13 +196,6 @@ export default function FuncionarioRegistroPonto() {
             // Registro bem-sucedido, atualiza registros do dia
             await buscarRegistrosDia();
 
-// Feedback sonoro opcional aqui
-            try {
-                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAAAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAcBSJ+0fPTgjMGHm7A7+CVSA0PVqzn77BdGAk+ltryxnkpBSl+zPDgkToIGGS57eGWT');
-                audio.play().catch(() => console.log('Audio não suportado'));
-            } catch (e) {
-                console.log('Feedback sonoro não disponível', e);
-            }
 
         } catch (error) {
             console.error('Erro ao registrar ponto:', error);
@@ -181,7 +206,6 @@ export default function FuncionarioRegistroPonto() {
     };
 
 
-    // Carregar dados iniciais
     useEffect(() => {
         if(!localStorage.getItem('token')) {
             navigate('/login');
@@ -199,7 +223,6 @@ export default function FuncionarioRegistroPonto() {
         carregarDados();
     }, []);
 
-    // Atualizar horário a cada segundo
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date());
@@ -208,33 +231,8 @@ export default function FuncionarioRegistroPonto() {
         return () => clearInterval(timer);
     }, []);
 
-    // Determinar próxima ação baseada nos registros
-    const determinarProximaAcao = () => {
-        if (registros.length === 0) {
-            return { tipo: 'entrada', label: 'Registrar Entrada', icon: LogIn, color: 'green' };
-        }
 
-        const ultimoRegistro = registros[registros.length - 1];
 
-        switch (ultimoRegistro.tipo) {
-            case 'entrada':
-                return { tipo: 'saida_almoco', label: 'Saída para Almoço', icon: Coffee, color: 'orange' };
-            case 'saida_almoco':
-                return { tipo: 'volta_almoco', label: 'Volta do Almoço', icon: Coffee, color: 'blue' };
-            case 'volta_almoco':
-                return { tipo: 'saida', label: 'Registrar Saída', icon: LogOut, color: 'red' };
-            case 'saida':
-                return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
-            case 'entrada_extra':
-                return { tipo: 'saida_extra', label: 'Saída da Hora Extra', icon: LogOut, color: 'indigo' };
-            case 'saida_extra':
-                return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
-            default:
-                return { tipo: 'entrada', label: 'Registrar Entrada', icon: LogIn, color: 'green' };
-        }
-    };
-
-    // Calcular horas trabalhadas no dia
     const calcularHorasTrabalhadas = () => {
         let totalMinutos = 0;
         let ultimaEntrada = null;
@@ -264,7 +262,6 @@ export default function FuncionarioRegistroPonto() {
         return `${horas}h${minutos.toString().padStart(2, '0')}m`;
     };
 
-    // Funções auxiliares para renderização
     const getStatusColor = (tipo) => {
         switch (tipo) {
             case 'entrada':
@@ -313,7 +310,6 @@ export default function FuncionarioRegistroPonto() {
 
     const proximaAcao = determinarProximaAcao();
 
-    // Loading inicial
     if (isLoadingData) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -325,7 +321,6 @@ export default function FuncionarioRegistroPonto() {
         );
     }
 
-    // Erro de carregamento
     if (!funcionario) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -355,6 +350,9 @@ export default function FuncionarioRegistroPonto() {
             console.error('Erro ao validar admin:', error);
             return false;
         }
+    };
+    const jornadaCompleta = () => {
+        return registros.some(reg => reg.tipo === 'saida_extra');
     };
 
 
@@ -518,7 +516,7 @@ export default function FuncionarioRegistroPonto() {
                             {/* Botão de ação - CLASSES FIXAS */}
                             <button
                                 onClick={registrarPonto}
-                                disabled={isLoading}
+                                disabled={isLoading || proximaAcao.tipo === 'jornada_finalizada'}
                                 className={`px-8 py-4 rounded-xl font-semibold text-lg transition-colors duration-200 flex items-center space-x-3 text-white ${
                                     proximaAcao.color === 'green' ? 'bg-green-600 hover:bg-green-700 disabled:bg-green-400' :
                                         proximaAcao.color === 'orange' ? 'bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400' :
@@ -544,8 +542,11 @@ export default function FuncionarioRegistroPonto() {
                         </div>
 
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4" />
-                            <span>Localização será detectada automaticamente</span>
+                            {proximaAcao.tipo === 'jornada_finalizada' && (
+                                <p className="text-sm text-gray-500 mt-2 flex items-center">
+                                    <Clock className="w-4 h-4 mr-1" /> Jornada encerrada. Aguardando novo dia útil.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

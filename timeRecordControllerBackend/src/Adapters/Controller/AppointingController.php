@@ -24,22 +24,14 @@ class AppointingController extends Controller
 
     public function markAppointment(Request $request, Response $response)
     {
-        $body = $this->getFormData($request);
-        $rules = [
-            'date' => 'required|date',
-            'time' => 'required|date_format:H:i:s',
-        ];
+
         $jwtPayload = $request->getAttribute('user');
         $userId = $jwtPayload->sub;
-        $validator = $this->validator->make($body, $rules, ValidationMessages::getMessages());
-        if ($validator->fails()) {
-            throw new ArgumentsValidationException($validator->errors()->toArray());
-        }
-        $validatedData = $validator->validated();
+        $actualDate = new DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
         $builder  = new AppointmentRecordBuilder(
             $userId,
-            new DateTime($validatedData['date']),
-            new DateTime($validatedData['time'])
+            $actualDate,
+            $actualDate
         );
         $appointmentData = $this->registerAppointmentCase->execute($builder);
         return $this->respondWithData($response, $appointmentData->toArray());
@@ -64,10 +56,10 @@ class AppointingController extends Controller
             throw new ArgumentsValidationException($validator->errors()->toArray());
         }
 
-        $date = new DateTime($dateFromClient);
-        $pdfContent = $this->exportGeneralReportOfDay->execute($date);
+        $actualDate = new DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
+        $pdfContent = $this->exportGeneralReportOfDay->execute($actualDate);
 
-        $filename = 'relatorio-geral-' . $date->format('Y-m-d') . '.pdf';
+        $filename = 'relatorio-geral-' . $actualDate->format('Y-m-d') . '.pdf';
 
         $response->getBody()->write($pdfContent);
 
