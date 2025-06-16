@@ -433,7 +433,7 @@ export default function FuncionarioRegistroPonto() {
                         </button>
 
                         <button
-                            onClick={() => navigate('/cadastro/admin/auth/new/user')}
+                            onClick={() => navigate('/cadastro/funcionario')}
                             className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-xl transition-colors"
                         >
                             <User className="w-5 h-5 mr-2" />
@@ -611,7 +611,6 @@ export default function FuncionarioRegistroPonto() {
                                 <li>• Registre todos os horários de entrada e saída</li>
                                 <li>• Não esqueça de registrar saída e volta do almoço</li>
                                 <li>• Em caso de problemas, contate a administração</li>
-                                <li>• Mantenha sua localização ativada para registros precisos</li>
                             </ul>
                         </div>
                     </div>

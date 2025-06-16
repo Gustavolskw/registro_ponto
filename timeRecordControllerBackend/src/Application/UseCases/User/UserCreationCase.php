@@ -22,7 +22,7 @@ class UserCreationCase
     public function __construct(private UserRepository $userRepository, private ProfileDAO $profileDAO, private WorkJourneyDAO $workJourneyDAO)
     {
     }
-    public function execute(UserBuilder $userData):AuthUser|UserData
+    public function execute(UserBuilder $userData):UserData
     {
         $profileData = $this->validateProfileType($userData->getProfileId());
         $workJourney = $this->validateWorkJourney($userData->getWorkJourneyId());
@@ -38,12 +38,7 @@ class UserCreationCase
         $newUser = $this->userRepository->save(
             $newUserData
         );
-        if($profileData->getId() == 1) {
-            $jwtToken = $this->generateJwt($newUser);
-            return new AuthUser($newUser, $jwtToken);
-        }
         return new UserData($newUser);
-
     }
     private function validateProfileType($profileId):Profile
     {

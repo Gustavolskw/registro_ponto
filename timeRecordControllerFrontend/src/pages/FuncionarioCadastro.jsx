@@ -197,6 +197,7 @@ export default function CadastroFuncionarioAdmin() {
                 throw new Error(errorData.message || 'Erro ao cadastrar funcionário');
             }
             const data = await response.json();
+            console.log(data);
             setSuccess(true);
 
             // Resetar formulário após 3 segundos
