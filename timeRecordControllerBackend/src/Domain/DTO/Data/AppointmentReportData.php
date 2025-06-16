@@ -40,7 +40,7 @@ class AppointmentReportData
         return [
             'matricula' => $this->matricula,
             'nome' => $this->nome,
-            'data' => $this->data->format('Y-m-d'),
+            'data' => $this->data->format('d/m/Y'),
             'entrada_manha' => $this->entradaManha?->format('H:i:s'),
             'saida_manha' => $this->saidaManha?->format('H:i:s'),
             'entrada_tarde' => $this->entradaTarde?->format('H:i:s'),
