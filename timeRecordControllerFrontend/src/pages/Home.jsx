@@ -127,11 +127,9 @@ export default function FuncionarioRegistroPonto() {
         const minutosAtuais = agora.getMinutes();
         const horarioAtual = `${horaAtual.toString().padStart(2, '0')}:${minutosAtuais.toString().padStart(2, '0')}`;
 
-        const dentroDaJanela = (inicio, fim) => horarioAtual >= inicio && horarioAtual <= fim;
         const temRegistro = (tipo) => registros.some(r => r.tipo === tipo);
         const jornadaCompleta = () => registros.some(r => r.tipo === 'saida_extra');
 
-        // ✅ Verificação prioritária: jornada já finalizada
         if (jornadaCompleta()) {
             return {
                 tipo: 'jornada_finalizada',
@@ -141,35 +139,41 @@ export default function FuncionarioRegistroPonto() {
             };
         }
 
-        // ✅ Janela extra (pós 18:15)
-        if (horarioAtual > '18:15') {
-            if (temRegistro('entrada_extra')) {
-                return { tipo: 'saida_extra', label: 'Saída da Hora Extra', icon: LogOut, color: 'indigo' };
-            } else {
-                return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
+        const sequencia = [
+            { tipo: 'entrada', label: 'Registrar Entrada', icon: LogIn, color: 'green', janela: ['07:45', '08:15'] },
+            { tipo: 'saida_almoco', label: 'Saída para Almoço', icon: Coffee, color: 'orange', janela: ['11:45', '12:15'] },
+            { tipo: 'volta_almoco', label: 'Volta do Almoço', icon: Coffee, color: 'blue', janela: ['13:45', '14:15'] },
+            { tipo: 'saida', label: 'Registrar Saída', icon: LogOut, color: 'red', janela: ['17:45', '18:15'] }
+        ];
+
+        for (const etapa of sequencia) {
+            if (!temRegistro(etapa.tipo)) {
+                const [inicio, fim] = etapa.janela;
+                if (horarioAtual <= fim) {
+                    return etapa;
+                }
             }
         }
 
-        // ✅ Janelas normais
-        if (dentroDaJanela('07:45', '08:15') && !temRegistro('entrada')) {
-            return { tipo: 'entrada', label: 'Registrar Entrada', icon: LogIn, color: 'green' };
+        // A partir daqui: após 18:15
+        if (horarioAtual > '18:15') {
+            if (!temRegistro('entrada_extra')) {
+                return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
+            } else if (!temRegistro('saida_extra')) {
+                return { tipo: 'saida_extra', label: 'Saída da Hora Extra', icon: LogOut, color: 'indigo' };
+            }
         }
 
-        if (dentroDaJanela('11:45', '12:15') && !temRegistro('saida_almoco')) {
-            return { tipo: 'saida_almoco', label: 'Saída para Almoço', icon: Coffee, color: 'orange' };
-        }
-
-        if (dentroDaJanela('13:45', '14:15') && !temRegistro('volta_almoco')) {
-            return { tipo: 'volta_almoco', label: 'Volta do Almoço', icon: Coffee, color: 'blue' };
-        }
-
-        if (dentroDaJanela('17:45', '18:15') && !temRegistro('saida')) {
-            return { tipo: 'saida', label: 'Registrar Saída', icon: LogOut, color: 'red' };
-        }
-
-        // ✅ Se nada for aplicável, default para entrada extra (fora de janelas e sem saída extra ainda registrada)
-        return { tipo: 'entrada_extra', label: 'Entrada Extra', icon: LogIn, color: 'purple' };
+        // Jornada acabou antes das 18:15 mas não inseriu horas extras ainda
+        return {
+            tipo: 'aguardando',
+            label: 'Aguardando horário válido...',
+            icon: Clock,
+            color: 'gray'
+        };
     };
+
+
 
     const calcularHorasTrabalhadas = () => {
         let totalMinutos = 0;
