@@ -38,15 +38,12 @@ class ValidateAppointmentRegisterCase
     }
 
 
-    public function validateTimeWindow(array $registerTypes, int $userId, string $time, DateTime $date, array $userAppointments): RegisterType|null
+    public function validateTimeWindow(array $registerTypes, int $userId, string $time, DateTime $date, array $userAppointments): ?RegisterType
     {
-        $matchedRegisterType = null;
-
         $lastAppointment = $this->getLastAppointment($userAppointments);
         $expectedNextRegisterType = $this->getExpectedNextRegisterType($lastAppointment?->getRegisterType(), $registerTypes);
 
         foreach ($registerTypes as $registerType) {
-            // Skip if this is not the next expected type
             if ($expectedNextRegisterType && $registerType->getId() !== $expectedNextRegisterType->getId()) {
                 continue;
             }
@@ -54,28 +51,36 @@ class ValidateAppointmentRegisterCase
             $start = $registerType->getStartWindow()?->format('H:i:s');
             $end = $registerType->getEndWindow()?->format('H:i:s');
 
-            if (!$registerType->isRequiresValidation()) {
-                foreach ($userAppointments as $appointment) {
-                    if ($appointment->getRegisterType()->getId() === $registerType->getId()) {
-                        continue 2; // Skip this type entirely
-                    }
+            foreach ($userAppointments as $appointment) {
+                if ($appointment->getRegisterType()->getId() === $registerType->getId()) {
+                    continue 2;
                 }
-                $matchedRegisterType = $registerType;
-                break;
             }
 
-            if (!$start || !$end) {
-                continue;
+            // Entrada Extra válida após 18:15
+            if ($registerType->getName() === 'Entrada Extra' && $time > '18:15:00') {
+                return $registerType;
             }
 
-            if ($time >= $start && $time <= $end) {
-                $matchedRegisterType = $registerType;
-                break;
+            // Saída Extra só é válida após Entrada Extra
+            if ($registerType->getName() === 'Saida Extra' && $time > '18:15:00') {
+                $hasEntradaExtra = array_filter($userAppointments, fn($r) => $r->getRegisterType()->getName() === 'Entrada Extra');
+
+                if (!empty($hasEntradaExtra)) {
+                    return $registerType;
+                } else {
+                    continue;
+                }
+            }
+
+            if ($start && $end && $time >= $start && $time <= $end) {
+                return $registerType;
             }
         }
 
-        return $matchedRegisterType;
+        return null;
     }
+
 
     private function getLastAppointment(array $appointments): ?AppointmentRecord
     {

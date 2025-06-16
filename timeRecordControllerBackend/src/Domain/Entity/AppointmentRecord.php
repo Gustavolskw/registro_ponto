@@ -13,7 +13,7 @@ class AppointmentRecord
     private RegisterType  $registerType;
     private DateTime $date;
     private DateTime $time;
-    private DateTimeInterface|null $createdAt;
+    private DateTime|null $createdAt;
 
     public function __construct(
         ?int $id,
@@ -21,7 +21,7 @@ class AppointmentRecord
         RegisterType $registerType,
         DateTime $date,
         DateTime $time,
-        ?DateTimeInterface $createdAt
+        ?DateTime $createdAt
     ) {
         $this->id = $id ?? null;
         $this->user = $user;
@@ -85,5 +85,11 @@ class AppointmentRecord
     {
         $this->id = $id;
     }
+
+    public function getDateTime(): DateTime
+    {
+        return new DateTime($this->date->format('Y-m-d') . ' ' . $this->time->format('H:i:s'));
+    }
+
 
 }

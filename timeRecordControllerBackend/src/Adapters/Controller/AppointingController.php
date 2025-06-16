@@ -28,6 +28,7 @@ class AppointingController extends Controller
         $jwtPayload = $request->getAttribute('user');
         $userId = $jwtPayload->sub;
         $actualDate = new DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
+        //$actualDate = new DateTime("2025-06-17 12:48:00"); // motivos de teste
         $builder  = new AppointmentRecordBuilder(
             $userId,
             $actualDate,
@@ -55,8 +56,7 @@ class AppointingController extends Controller
         if ($validator->fails()) {
             throw new ArgumentsValidationException($validator->errors()->toArray());
         }
-
-        $actualDate = new DateTime('now', new \DateTimeZone('America/Sao_Paulo'));
+        $actualDate = new DateTime($dateFromClient);
         $pdfContent = $this->exportGeneralReportOfDay->execute($actualDate);
 
         $filename = 'relatorio-geral-' . $actualDate->format('Y-m-d') . '.pdf';
